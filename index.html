@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Churras com Paulinho</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      color: #b30000;
+      text-align: center;
+      padding: 20px;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/93/Bandeira-do-Sport-Club-Internacional-RS.svg');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      background-attachment: fixed;
+      background-blend-mode: lighten;
+    }
+
+    h1, h2 {
+      color: #b30000;
+    }
+
+    img {
+      margin-top: 20px;
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    button, input {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1em;
+    }
+
+    input {
+      width: 60%;
+      max-width: 300px;
+      border: 1px solid #b30000;
+    }
+
+    button {
+      background-color: #b30000;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #8b0000;
+    }
+
+    #listaConvidados {
+      margin-top: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      color: #333;
+      text-align: left;
+    }
+
+    #contador {
+      font-weight: bold;
+      margin-top: 15px;
+      font-size: 1.2em;
+    }
+
+    @media (max-width: 600px) {
+      input {
+        width: 80%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Paulinho é o melhor tio do mundo</h1>
+  <p>Por isso, vai botar o churrasco pros guri!</p>
+  <img src="kit-churrasco-completo-2_0-debetti_img1_jpg.webp" alt="Kit churrasco completo" />
+
+  <div id="contador"></div>
+
+  <h2>Confirme sua presença</h2>
+  <input type="text" id="nomeConvidado" placeholder="Digite seu nome" />
+  <br/>
+  <button onclick="confirmarPresenca()">Confirmar Presença</button>
+  <button onclick="enviarWhatsapp()">Confirmar via WhatsApp</button>
+
+  <div id="listaConvidados">
+    <h3>Confirmados até agora:</h3>
+    <ul id="convidadosUl"></ul>
+  </div>
+
+  <h2>Hino do Sport Club Internacional</h2>
+  <audio controls>
+    <source src="https://www.somoscolorados.com.br/audio/hino-internacional.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    // Contador regressivo até sábado às 18h
+    function atualizarContador() {
+      const agora = new Date();
+      const proximoSabado = new Date();
+      proximoSabado.setDate(agora.getDate() + (6 - agora.getDay() + 7) % 7);
+      proximoSabado.setHours(18, 0, 0, 0);
+
+      const diff = proximoSabado - agora;
+      if (diff < 0) {
+        document.getElementById("contador").textContent = "Já começou o churras!";
+        return;
+      }
+
+      const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutos = Math.floor((diff / (1000 * 60)) % 60);
+      const segundos = Math.floor((diff / 1000) % 60);
+
+      document.getElementById("contador").textContent =
+        `Faltam ${dias}d ${horas}h ${minutos}m ${segundos}s pro churras!`;
+    }
+
+    setInterval(atualizarContador, 1000);
+    atualizarContador();
+
+    // Lista inicial de convidados
+    const convidadosIniciais = ["Thiérry Nunes", "Lorenzo Bittencourt", "Matheus", "Paulo Henrique Faria"];
+    if (!localStorage.getItem("convidados")) {
+      localStorage.setItem("convidados", JSON.stringify(convidadosIniciais));
+    }
+
+    function confirmarPresenca() {
+      const nome = document.getElementById("nomeConvidado").value.trim();
+      if (!nome) {
+        alert("Digite seu nome antes de confirmar!");
+        return;
+      }
+
+      let convidados = JSON.parse(localStorage.getItem("convidados")) || [];
+      if (!convidados.includes(nome)) {
+        convidados.push(nome);
+        localStorage.setItem("convidados", JSON.stringify(convidados));
+        atualizarListaConvidados();
+        alert("Presença confirmada!");
+      } else {
+        alert("Você já confirmou, campeão!");
+      }
+
+      document.getElementById("nomeConvidado").value = "";
+    }
+
+    function atualizarListaConvidados() {
+      const convidados = JSON.parse(localStorage.getItem("convidados")) || [];
+      const ul = document.getElementById("convidadosUl");
+      ul.innerHTML = "";
+      convidados.forEach(nome => {
+        const li = document.createElement("li");
+        li.textContent = nome;
+        ul.appendChild(li);
+      });
+    }
+
+    function enviarWhatsapp() {
+      const nome = document.getElementById("nomeConvidado").value.trim();
+      if (!nome) {
+        alert("Digite seu nome antes de enviar pelo WhatsApp!");
+        return;
+      }
+
+      const telefone = "5551992990217"; // Número real do Paulinho
+      const mensagem = encodeURIComponent(`Fala Paulinho! Aqui é o(a) ${nome} confirmando presença no churras de sábado às 18h! 🥩🔥`);
+      window.open(`https://wa.me/${telefone}?text=${mensagem}`, "_blank");
+    }
+
+    atualizarListaConvidados();
+  </script>
+</body>
+</html>
